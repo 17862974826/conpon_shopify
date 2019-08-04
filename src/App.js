@@ -1,26 +1,38 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import Home from './pages/home/index'
+import { Layout } from 'antd';
+import { stepData } from './store'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+const { Header, Footer, Content } = Layout;
+
+
+
+class App extends React.Component {
+
+  constructor(props){
+    super(props)
+    this.state = {
+      currentStep: 1,
+      stepData
+    }
+  }
+
+  render(){
+    const { currentStep } = this.state 
+    return ( 
+      <Layout className="layout">
+        <Header>
+          <div className="logo" />
+        </Header>
+        <Content style={{ padding: '50px' }}>
+            <Home step={currentStep} stepData={stepData}/>
+        </Content>
+        <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
+      </Layout> 
+      )
+  }
+ 
 }
 
 export default App;

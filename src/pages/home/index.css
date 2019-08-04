@@ -1,0 +1,16 @@
+.line {
+    height: 3px;
+    margin: 20px  0 40px 0;
+    background-color: #ddd
+}
+.offer-contain {
+    display: flex;
+    flex-direction: row
+}
+.offer-wrap {
+    margin-right: 200px;
+}
+.offer-subTitle {
+    font-weight: bold;
+    margin-left: 5px;
+}
