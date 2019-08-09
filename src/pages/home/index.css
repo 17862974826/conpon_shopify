@@ -5,12 +5,28 @@
 }
 .offer-contain {
     display: flex;
+    margin-top: 80px;
     flex-direction: row
 }
 .offer-wrap {
     margin-right: 200px;
+    width: 90px;
 }
 .offer-subTitle {
     font-weight: bold;
     margin-left: 5px;
+    white-space: nowrap
+}
+.offer-input-wrap {
+    display: flex;
+    flex-direction: row;
+    align-items: center
+}
+.offer-select-wrap {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 40px;
+    width: 600px;
+    height: 30px;
 }

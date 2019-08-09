@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 import Home from './pages/home/index'
 import { Layout } from 'antd';
-import { stepData } from './store'
+import { stepData, radioData, AvailabilityData } from './store'
 
 const { Header, Footer, Content } = Layout;
 
@@ -26,7 +26,12 @@ class App extends React.Component {
           <div className="logo" />
         </Header>
         <Content style={{ padding: '50px' }}>
-            <Home step={currentStep} stepData={stepData}/>
+            <Home 
+              step={currentStep} 
+              stepData={stepData} 
+              radioData={radioData}
+              AvailabilityData={AvailabilityData}
+            />
         </Content>
         <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
       </Layout> 
