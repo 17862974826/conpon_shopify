@@ -14,10 +14,20 @@ class Availability extends Component {
     }
 
     handleOfferClick = (e) => {
-        console.log(e)
+         const { onDataLoad } = this.props
+         onDataLoad({
+             type: 'offerAppear',
+             value: e
+         })
     }
 
-    handleSlashClick = (e) =>{}
+    handleSlashClick = (e) =>{
+        const { onDataLoad } = this.props
+        onDataLoad({
+            type: 'invitedSlash',
+            value: e
+        })
+    }
 
     render(){
         const { AvailabilityData = {} } = this.props

@@ -14,13 +14,24 @@ class Offer extends Component {
         }
     }
     handleSelectRadio = (e) => {
+        const { onDataLoad } = this.props
         const value = e.target.value
+        onDataLoad({
+            type: 'discount',
+            value
+        })
         this.setState({
             value
         })
     }
     handleInputValue = (e) => {
        this.inputValue = e.target.value
+       const { onDataLoad } = this.props
+       onDataLoad({
+           type: 'name',
+           value: this.inputValue
+       })
+       
     }
 
     render(){

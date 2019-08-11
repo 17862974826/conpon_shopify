@@ -20,15 +20,15 @@ const stepData = [
 const radioData = [
    {
         title: '$0 offer',
-        value: 0
+        value: '0'
    },
    {
        title: 'Take a half',
-       value: 1
+       value: '50'
    },
    {
        title: 'discount as you go',
-       value: 2
+       value: '100'
    }
 ]
 
