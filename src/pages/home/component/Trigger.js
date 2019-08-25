@@ -3,6 +3,12 @@ import { Button, Table, Icon, InputNumber, Modal, List, Checkbox, DatePicker  } 
 import '../index.css'
 import axios from 'axios'
 
+const styles = {
+    wrap: {
+        minHeight: 301
+    }
+}
+
 const { RangePicker } = DatePicker || {}
 
   
@@ -12,8 +18,7 @@ class Trigger extends Component {
         super(props)
         this.checkboxList = []
         this.state = {
-            title: 'Step 2',
-            subTitle: 'Set trigger for $0 offer',
+            title: 'Set trigger for $0 offer',
             summary: 'Choose products or collections that trigger this offer',
             dataSource: [],
             products:[],
@@ -284,23 +289,27 @@ class Trigger extends Component {
     }
 
     render(){
-        const { title ,subTitle, summary, dataSource = [],products = [], isShowModal } = this.state
+        const { title, dataSource = [],products = [], isShowModal } = this.state
         return (
-            <div className={'offer-contain'}>
-                <div className={'offer-wrap'}>
-                    <h2>{title}</h2>
-                    <p className={'offer-subTitle'}>{subTitle}</p>
+            <div style={{...styles.wrap}}>
+                <div style={{ marginBottom: 12 }}>
+                    <p style={{marginBottom: 23, fontFamily: 'Aileron-Regular', fontSize: 18, color: '#333333'}}>{title}</p>
+                    <p style={{fontSize: 14, color: '#666666', marginLeft: 20}}>{'Choose products or collections that trigger this offer'}</p>
                 </div>
                 <div>
-                    <p style={{fontSize: 18, marginBottom: 20}}>{summary}</p>
-                    <div style={{marginBottom: 20}}>
-                        <Button style={{marginRight: 20}} onClick={this.handleClickAddProduct}>{'Choose products'}</Button>
-                        <Button>{'Choose collections'}</Button>
+                    <div style={{marginBottom: 20, marginLeft:20 }}>
+                        <Button style={{marginRight: 10, width: 150, height: 36, borderRadius: 4, background: '#F0C26A'}} onClick={this.handleClickAddProduct}>
+                            <span style={{color: '#fff'}}>{'Choose products'}</span>
+                        </Button>
+                        <Button style={{marginRight: 10, width: 150, height: 36, borderRadius: 4, background: '#F0C26A'}}>
+                            <span style={{color: '#fff'}}>{'Choose collections'}</span>
+                        </Button>
                     </div>
                     <Table 
                         dataSource={dataSource} 
                         columns={this.columns}
                         bordered
+                        style={{width: 1200}}
                         pagination={{
                             total: dataSource.length,
                             pageSize: 20,

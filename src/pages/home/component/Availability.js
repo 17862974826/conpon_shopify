@@ -1,15 +1,34 @@
 import React, { Component } from 'react'
 import { Button, Checkbox } from 'antd';
-import  '../index.css'
+
+const styles = {
+    wrap:{
+        height: 412,
+        marginTop: 53,
+        overflow: 'hidden'
+    },
+    titleWrap:{
+        display: 'flex',
+        marginBottom: 20,
+        alignItems: 'flex-end'
+    },
+    content:{
+        height: 372,
+        width: 1200,
+        paddingLeft: 20,
+        paddingTop: 30,
+        background: '#fff',
+        borderRadius: 4
+    }
+}
 
 
 class Availability extends Component {
     constructor(props){
         super(props)
         this.state = {
-            title: 'Step 3',
-            subTitle: 'Availability',
-            description: 'To whom the offer appears and who can be invited to slash'
+            title: 'Step 3 Availability' ,
+            subTitle: 'To whom the offer appears and who can be invited to slash',
         }
     }
 
@@ -32,25 +51,26 @@ class Availability extends Component {
     render(){
         const { AvailabilityData = {} } = this.props
         const { offer = {}, slash = {}} = AvailabilityData || {}
-        const { title: offerTitle, list: offerList}  = offer || {}
+        const { list: offerList}  = offer || {}
         const { title: slashTitle, list} = slash || {}
-        const { title, subTitle, description } = this.state
+        const { title, subTitle } = this.state
        
         return (
-            <div className={'offer-contain'}>
-                <div className={'offer-wrap'}>
-                    <h2>{title}</h2>
-                    <p className={'offer-subTitle'}>{subTitle}</p>
-                    <p style={{fontSize: 14}}>{description}</p>
+            <div style={{...styles.wrap}}>
+                <div style={{...styles.titleWrap}}>
+                    <p style={{marginRight: 40, fontFamily:'Aileron-Regular', color: '#333', fontSize: 18}}>{title}</p>
+                    <p style={{fontFamily:'Aileron-Regular', color: '#666', fontSize: 14}}>{subTitle}</p>
                 </div>
-                <div>
-                    <p style={{marginBottom: 20, fontWeight: 'bold'}}>{offerTitle}</p>
-                    <Checkbox.Group options={offerList}  onChange={this.handleOfferClick} />
-                    <Button style={{marginTop: 20, width: 300, display: 'block'}}>{'Select tags'}</Button>
+                <div style={{...styles.content}}>
+                    <div>
+                        <p style={{marginBottom: 20, fontSize: 14, color: '#333'}}>{'To whom the offer appears'}</p>
+                        <Checkbox.Group options={offerList}  onChange={this.handleOfferClick} />
+                        <Button style={{marginTop: 20, width: 120, height: 32, backgroundColor: '#DB6366', color: '#fff',display: 'block'}}>{'Select tags'}</Button>
+                    </div>
                     <div style={{marginTop: 60}}>
-                        <p style={{marginBottom: 20, fontWeight: 'bold'}}>{slashTitle}</p>
+                        <p style={{marginBottom: 20, fontSize: 14, color: '#333'}}>{slashTitle}</p>
                         <Checkbox.Group options={list}  onChange={this.handleSlashClick} />
-                        <Button style={{marginTop: 20, width: 300, display: 'block'}}>{'Select tags'}</Button>
+                        <Button style={{marginTop: 20, width: 120, height: 32, backgroundColor: '#DB6366', color: '#fff',display: 'block'}}>{'Select tags'}</Button>
                     </div>
                 </div>
             </div>

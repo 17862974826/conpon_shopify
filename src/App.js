@@ -2,9 +2,10 @@ import React from 'react';
 import './App.css';
 import Home from './pages/home/index'
 import { Layout } from 'antd';
+import logo from '../public/images/logo.png'
 import { stepData, radioData, AvailabilityData } from './store'
 
-const { Header, Footer, Content } = Layout;
+const {  Footer, Content } = Layout;
 
 
 
@@ -19,13 +20,17 @@ class App extends React.Component {
   }
 
   render(){
-    const { currentStep } = this.state 
+    const { currentStep } = this.state  
     return ( 
-      <Layout className="layout">
-        <Header>
-          <div className="logo" />
-        </Header>
-        <Content style={{ padding: '50px' }}>
+      <Layout className="layout" style={{ background: '#F7F7F7'}}>
+        <div style={{position: 'sticky',top: 0, left: 0,width: 1920,  zIndex: 999,backgroundColor: '#DADADA', height: 76, overflow: 'hidden'}}>
+          <div style={{width: 1920, margin: '0 auto'}}>
+              <p style={{width: 108, height: 40, marginTop: 18, marginLeft: 361}}>
+                <img src={logo} alt='' style={{width: 108, height: 40, objectFit: 'cover'}}/>
+              </p>
+          </div>
+        </div>
+        <Content style={{ paddingLeft: 360, boxSizing: 'border-box' }}>
             <Home 
               step={currentStep} 
               stepData={stepData} 
@@ -33,7 +38,7 @@ class App extends React.Component {
               AvailabilityData={AvailabilityData}
             />
         </Content>
-        <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
+        <Footer style={{ textAlign: 'center', marginTop: 100 }}>Ant Design ©2018 Created by Ant UED</Footer>
       </Layout> 
       )
   }

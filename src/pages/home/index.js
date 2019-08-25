@@ -6,6 +6,7 @@ import Availability from './component/Availability'
 import Choose from './component/Choose'
 import './index.css'
 import axios from 'axios'
+import Save from './component/Save'
 
 const { Step } = Steps;
 
@@ -54,31 +55,12 @@ class Home extends Component {
     render(){
         const { currentStep, stepData = [], radioData = [], AvailabilityData = {} } = this.props
       return (
-        <>
-        <div style={{position: 'sticky', top: 0,  zIndex: 100 ,paddingTop: 20,  backgroundColor: '#f0f2f5'}}>
-          <Steps current={currentStep}>
-            {
-              stepData.map(data => {
-                const { title } = data || {}
-                return  <Step title={title} key={title}/>
-              })
-            }
-          </Steps>
-          <div className={'line'}/>
+        <div style={{background: 'rgb(247,247,247)'}}>
+          <Save/>
+          <Offer radioData={radioData} onDataLoad={this.handleOfferData}/>
+          <Trigger onDataLoad={this.handleOfferData}/>
+          <Availability AvailabilityData={AvailabilityData}  onDataLoad={this.handleOfferData}/>
         </div>
-        <Offer radioData={radioData} onDataLoad={this.handleOfferData}/>
-        <div className={'line'}/>
-        <Trigger onDataLoad={this.handleOfferData}/>
-        <div className={'line'}/>
-        <Availability AvailabilityData={AvailabilityData}  onDataLoad={this.handleOfferData}/>
-        <div className={'line'}/>
-        <Choose  onDataLoad={this.handleOfferData} />
-        <div className={'line'}/>
-        <div style={{ display: 'flex',flexDirection: 'row', width: 150, justifyContent: 'space-between'}}>
-          <Button>{'Cancel'}</Button>
-          <Button onClick={this.handleSaveClick}>{'Save'}</Button>
-        </div>
-        </>
       )
     }
 }
