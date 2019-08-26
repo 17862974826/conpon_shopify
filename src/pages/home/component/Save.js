@@ -22,6 +22,7 @@ const styles = {
 }
 
 const Save = (props) => {
+    const { handleSaveClick } = props
     return (
         <div style={{...styles.wrap}}>
             <div>
@@ -29,7 +30,7 @@ const Save = (props) => {
                 <Icon type="close" />
                 <span style={{...styles.text}}>{'Cancle'}</span>
             </Button>
-            <Button style={{...styles.button}}>
+            <Button style={{...styles.button}} onClick={handleSaveClick}>
                 <Icon type="save" />
                 <span style={{...styles.text}}>{'Save'}</span>
             </Button>

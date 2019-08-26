@@ -1,5 +1,5 @@
 import React, { Component} from 'react'
-import { Button, Table, Icon, InputNumber, Modal, List, Checkbox, DatePicker  } from 'antd';
+import { Button, Table, Icon, InputNumber, Modal, List, Spin, Radio, DatePicker  } from 'antd';
 import '../index.css'
 import axios from 'axios'
 
@@ -19,6 +19,7 @@ class Trigger extends Component {
         this.checkboxList = []
         this.state = {
             title: 'Set trigger for $0 offer',
+            radioValue: '',
             summary: 'Choose products or collections that trigger this offer',
             dataSource: [],
             products:[],
@@ -206,16 +207,16 @@ class Trigger extends Component {
     }
 
     handleShowModal = () => {
-        const { products = []} = this.state
-        const _products = products.map((data, index) => {
-            const checked  = this.checkboxList[index] && this.checkboxList[index].checked
-            return {
-                ...data,
-                isChecked: checked || false
-            }
+        const { products = [], radioValue} = this.state
+       
+        const _products = products.filter((data, index) => {
+            const { node } = data || {}
+            const { id } = node || {}
+            
+            return radioValue === id
         })
-
-        const _datsSource = _products.filter(d => d.isChecked).map((d,index) => {
+       
+        const _datsSource = _products.map((d,index) => {
             const { node } = d || {}
             const { title,id,  picture} = node || {}
 
@@ -230,7 +231,6 @@ class Trigger extends Component {
         })
 
         this.handleChangeModalSatus({
-            products: _products,
             dataSource: _datsSource
         })
     }
@@ -246,13 +246,11 @@ class Trigger extends Component {
         })
     }
 
-    handleSelectCehckbox = (index,id,e) => {
-        const checked = e.target.checked
-        this.checkboxList[index] = {
-            index,
-            checked,
-            id
-        }
+    handleSelectCehckbox = (e) => {
+        const id = e.target.value
+        this.setState({
+            radioValue: id
+        })
     }
 
     handleClickAddProduct = () => {
@@ -290,6 +288,13 @@ class Trigger extends Component {
 
     render(){
         const { title, dataSource = [],products = [], isShowModal } = this.state
+        const radioStyle = {
+            display: 'block',
+            height: '50px',
+            width: '100%',
+            borderBottom: '1px dashed #ccc',
+            lineHeight: '50px',
+          };
         return (
             <div style={{...styles.wrap}}>
                 <div style={{ marginBottom: 12 }}>
@@ -323,20 +328,15 @@ class Trigger extends Component {
                     onOk={this.handleShowModal}
                     onCancel={this.handleCancelModal}
                     >
-                    <List
-                        bordered
-                        loading={!Boolean(Array.isArray(products) && products.length)}
-                        dataSource={products}
-                        renderItem={(item,index) => {
-                            const { node = {} } = item || {}
-                            const { id, onlineStoreUrl, title, images = []} = node || {}
-                            return (<List.Item key={id}>
-                                    <a href={onlineStoreUrl} style={{display: 'flex'}}>
-                                        <Checkbox onChange={this.handleSelectCehckbox.bind(null, index, id)}>{title}</Checkbox>
-                                    </a>
-                                </List.Item>)
-                        }}
-                        />
+                        <Radio.Group onChange={this.handleSelectCehckbox.bind(null)} value={this.state.radioValue} style={{width: '100%'}}>
+                            {
+                                Array.isArray(products) && products.length ? products.map(value => {
+                                    const { node = {} } = value || {}
+                                    const { id, title, images = []} = node || {}
+                                    return  <Radio style={radioStyle} value={id} key={id}>{title}</Radio>
+                                }) : <Spin />
+                            }
+                        </Radio.Group>
                 </Modal>
             </div>
         )
