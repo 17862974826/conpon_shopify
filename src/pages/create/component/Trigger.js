@@ -257,11 +257,7 @@ class Trigger extends Component {
         const {  products = [] } = this.state
 
         if(!Array.isArray(products) || !products.length) {
-            axios.get('/c/api/shopify/productSearch.php',{
-                params:{
-                    title: 'tianyangtest'
-                }
-            }).then(res => {
+            axios.get('/c/api/shopify/productSearch.php').then(res => {
                
                 const { data: { data = {} } = {} } = res || {}
                 const { list = {} } = data || {}
