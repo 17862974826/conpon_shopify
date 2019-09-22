@@ -17,6 +17,8 @@ class Trigger extends Component {
     constructor(props){
         super(props)
         this.checkboxList = []
+        this.currentPage = 1
+        this.showPage = 1
         this.state = {
             title: 'Set trigger for $0 offer',
             radioValue: '',
@@ -66,10 +68,14 @@ class Trigger extends Component {
                                 offer: value
                             }
                            })
-                           onDataLoad({
+                           this.setState({
+                            dataSource: _dataSource
+                          }, function(){
+                            onDataLoad({
                                 type: 'products',
                                 value:_dataSource
                             })
+                          })
                         }}/>
                     </div>
                 )
@@ -84,16 +90,22 @@ class Trigger extends Component {
                          <InputNumber min={0} onChange={(value) => {
                             const { onDataLoad } = this.props
                             const { dataSource } = this.state
+                        
                            const _dataSource = dataSource.map(d => {
                             return {
                                 ...d,
                                 slash: value
                             }
                            })
-                           onDataLoad({
+                          this.setState({
+                            dataSource: _dataSource
+                          }, function(){
+                            onDataLoad({
                                 type: 'products',
                                 value:_dataSource
                             })
+                          })
+                           
                         }}/>
                     </div>
                 )
@@ -208,8 +220,8 @@ class Trigger extends Component {
 
     handleShowModal = () => {
         const { products = [], radioValue} = this.state
-       
-        const _products = products.filter((data, index) => {
+        
+        const _products = products[this.showPage].filter((data, index) => {
             const { node } = data || {}
             const { id } = node || {}
             
@@ -230,6 +242,8 @@ class Trigger extends Component {
             }
         })
 
+
+     
         this.handleChangeModalSatus({
             dataSource: _datsSource
         })
@@ -248,34 +262,89 @@ class Trigger extends Component {
 
     handleSelectCehckbox = (e) => {
         const id = e.target.value
+       
         this.setState({
             radioValue: id
         })
     }
 
-    handleClickAddProduct = () => {
-        const {  products = [] } = this.state
+    handlePrevData = () => {
+        if(this.showPage <= 1) this.showPage = 1
+        this.showPage -= 1
+        this.setState({
+            showPage: this.showPage
+        })
+    }
 
-        if(!Array.isArray(products) || !products.length) {
-            axios.get('/c/api/shopify/productSearch.php').then(res => {
-               
-                const { data: { data = {} } = {} } = res || {}
-                const { list = {} } = data || {}
-                const { products: { edges = [] } =  {} } = list || {}
-                const _edges = edges.map(data => {
-                    return {
-                        ...data,
-                        isChecked: false
-                    }
-                })
-                this.checkboxList.length = _edges.length
-                this.setState({
-                    products: _edges
-                })
-            }).catch(error => {
-                console.error(error)
+    handleLoadMore =() => {
+        this.showPage += 1
+        this.setState({
+            showPage: this.showPage
+        })
+        if(!this.cursor) return 
+        const { products  = []} = this.state 
+        if(Array.isArray(products[this.showPage]) && products[this.showPage].length) {
+            
+            return 
+        } 
+
+
+
+        axios.get('/c/api/shopify/productSearch.php',{
+            params:{
+                cursor: this.cursor
+            }
+        }).then(res => {
+            const { data: { data = {} } = {} } = res || {}
+            const { list = {} } = data || {}
+            const { products: { edges = [], pageInfo = {} } =  {} } = list || {}
+            const { hasNextPage } = pageInfo || {}
+            this.hasNext = hasNextPage
+            this.cursor = edges[edges.length - 1].cursor
+            this.currentPage += 1
+            this.endPage = ! this.hasNext &&  this.currentPage
+            const _edges = edges.map(data => {
+                return {
+                    ...data,
+                    isChecked: false
+                }
             })
-        }
+            this.checkboxList.length = _edges.length
+
+            products[this.currentPage] = edges
+            this.setState({
+                products,
+            })
+        }).catch(error => {
+            console.error(error)
+        })
+    }
+
+    handleClickAddProduct = () => {
+        
+        axios.get('/c/api/shopify/productSearch.php').then(res => {
+            const { products = [] } = this.state 
+            const { data: { data = {} } = {} } = res || {}
+            const { list = {} } = data || {}
+            const { products: { edges = [], pageInfo = {} } =  {} } = list || {}
+            const { hasNextPage } = pageInfo || {}
+            this.hasNext = hasNextPage
+            this.cursor = edges[edges.length - 1].cursor
+          
+            const _edges = edges.map(data => {
+                return {
+                    ...data,
+                    isChecked: false
+                }
+            })
+            products[this.currentPage] = edges
+            this.checkboxList.length = _edges.length
+            this.setState({
+                products
+            })
+        }).catch(error => {
+            console.error(error)
+        })
 
         this.setState({
             isShowModal: true
@@ -284,10 +353,13 @@ class Trigger extends Component {
 
     render(){
         const { title, dataSource = [],products = [], isShowModal } = this.state
+      
         const radioStyle = {
             display: 'block',
             height: '50px',
             width: '100%',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
             borderBottom: '1px dashed #ccc',
             lineHeight: '50px',
           };
@@ -326,13 +398,15 @@ class Trigger extends Component {
                     >
                         <Radio.Group onChange={this.handleSelectCehckbox.bind(null)} value={this.state.radioValue} style={{width: '100%'}}>
                             {
-                                Array.isArray(products) && products.length ? products.map(value => {
+                                Array.isArray(products[this.showPage]) && products[this.showPage].length ? products[this.showPage].map(value => {
                                     const { node = {} } = value || {}
                                     const { id, title, images = []} = node || {}
                                     return  <Radio style={radioStyle} value={id} key={id}>{title}</Radio>
                                 }) : <Spin />
                             }
                         </Radio.Group>
+                        <Button style={{marginRight: 20}} onClick={this.handleLoadMore} disabled={this.showPage ===  this.endPage}>{'下一页'}</Button>
+                        <Button onClick={this.handlePrevData} disabled={this.showPage === 1}>{'上一页'}</Button>
                 </Modal>
             </div>
         )

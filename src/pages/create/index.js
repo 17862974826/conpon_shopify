@@ -17,6 +17,8 @@ class Create extends Component {
   handleOfferData = (data) => {
     const { type, value } = data || {}
     this.offerData[type] = value
+
+    
   }
 
   handleSaveClick = () => {
