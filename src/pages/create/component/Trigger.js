@@ -274,6 +274,7 @@ class Trigger extends Component {
         this.setState({
             showPage: this.showPage
         })
+       
     }
 
     handleLoadMore =() => {
@@ -283,13 +284,13 @@ class Trigger extends Component {
         })
         if(!this.cursor) return 
         const { products  = []} = this.state 
+       
         if(Array.isArray(products[this.showPage]) && products[this.showPage].length) {
-            
             return 
         } 
 
 
-
+        
         axios.get('/c/api/shopify/productSearch.php',{
             params:{
                 cursor: this.cursor
@@ -321,6 +322,16 @@ class Trigger extends Component {
     }
 
     handleClickAddProduct = () => {
+
+        const { products  = []} = this.state 
+       
+        if(Array.isArray(products[this.showPage]) && products[this.showPage].length) {
+
+            this.setState({
+                isShowModal: true
+            })
+            return 
+        } 
         
         axios.get('/c/api/shopify/productSearch.php').then(res => {
             const { products = [] } = this.state 
@@ -353,7 +364,7 @@ class Trigger extends Component {
 
     render(){
         const { title, dataSource = [],products = [], isShowModal } = this.state
-      
+        console.log(products[this.showPage])
         const radioStyle = {
             display: 'block',
             height: '50px',
