@@ -17,7 +17,7 @@ const CreateRoute = () => {
 }
 
 const HomeRoute = (props) => {
-  console.log(props)
+  
   return  <Home 
     {...props}
     radioData={radioData}

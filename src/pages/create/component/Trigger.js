@@ -1,7 +1,9 @@
 import React, { Component} from 'react'
-import { Button, Table, Icon, InputNumber, Modal, List, Spin, Radio, DatePicker  } from 'antd';
+import { Button, Table, Icon, InputNumber,Input, Modal, List, Radio, DatePicker  } from 'antd';
 import '../index.css'
 import axios from 'axios'
+
+const { Search } = Input;
 
 const styles = {
     wrap: {
@@ -17,15 +19,18 @@ class Trigger extends Component {
     constructor(props){
         super(props)
         this.checkboxList = []
-        this.currentPage = 1
-        this.showPage = 1
+        this.isFirstRender = true
+        this.endPage = false
         this.state = {
             title: 'Set trigger for $0 offer',
             radioValue: '',
             summary: 'Choose products or collections that trigger this offer',
             dataSource: [],
             products:[],
-            isShowModal: false
+            inputValue: '',
+            loading: true,
+            isShowModal: false,
+            currentId: null
         }
         this.columns = [
             {
@@ -35,7 +40,7 @@ class Trigger extends Component {
                  const { picture } = data || {}
                 return (
                     <div style={{display: 'flex', justifyContent: 'center'}}>
-                        <img src={picture} style={{width: 60, height: 60, borderRadius: 6, overflow: 'hidden'}}/>
+                        <img src={picture} style={{width: 120, height: 120, borderRadius: 12, overflow: 'hidden'}}/>
                     </div>
                 )
               }
@@ -219,21 +224,26 @@ class Trigger extends Component {
     }
 
     handleShowModal = () => {
-        const { products = [], radioValue} = this.state
+        const { products = [], currentId} = this.state
         
-        const _products = products[this.showPage].filter((data, index) => {
+        const _products = products.filter((data, index) => {
             const { node } = data || {}
             const { id } = node || {}
             
-            return radioValue === id
+            return currentId === id
         })
        
         const _datsSource = _products.map((d,index) => {
             const { node } = d || {}
-            const { title,id,  picture} = node || {}
+            const { title,id,  images} = node || {}
+            const { edges = []} = images || {}
+            const [edgesResult = {}] = edges || []
+
+            const { node: { src } = {}} = edgesResult || {}
+
 
             return {
-                picture: picture || '//cdn.shopify.com/s/files/1/0252/6075/2970/products/20180705190154_31078_512x512.jpg?v=1562312148',
+                picture: src,
                 title,
                 id,
                 offer: 0,
@@ -268,28 +278,14 @@ class Trigger extends Component {
         })
     }
 
-    handlePrevData = () => {
-        if(this.showPage <= 1) this.showPage = 1
-        this.showPage -= 1
-        this.setState({
-            showPage: this.showPage
-        })
-       
-    }
 
     handleLoadMore =() => {
-        this.showPage += 1
-        this.setState({
-            showPage: this.showPage
-        })
+
         if(!this.cursor) return 
         const { products  = []} = this.state 
-       
-        if(Array.isArray(products[this.showPage]) && products[this.showPage].length) {
-            return 
-        } 
-
-
+        this.setState({
+            loading: true
+        })
         
         axios.get('/c/api/shopify/productSearch.php',{
             params:{
@@ -301,59 +297,60 @@ class Trigger extends Component {
             const { products: { edges = [], pageInfo = {} } =  {} } = list || {}
             const { hasNextPage } = pageInfo || {}
             this.hasNext = hasNextPage
-            this.cursor = edges[edges.length - 1].cursor
-            this.currentPage += 1
-            this.endPage = ! this.hasNext &&  this.currentPage
+            this.cursor = edges[edges.length - 1] && edges[edges.length - 1].cursor
+
+            this.endPage = !this.hasNext 
+
             const _edges = edges.map(data => {
                 return {
                     ...data,
                     isChecked: false
                 }
             })
-            this.checkboxList.length = _edges.length
 
-            products[this.currentPage] = edges
             this.setState({
-                products,
+                products: products.concat(edges),
+                loading: false
             })
+
         }).catch(error => {
             console.error(error)
+            this.setState({
+                loading: false
+            })
         })
     }
+    
+    handleSearcgProduct = (opt) => {
+        const { title } = opt || {}
 
-    handleClickAddProduct = () => {
+        let requestUrl = `/c/api/shopify/productSearch.php?title=${title}`
 
-        const { products  = []} = this.state 
-       
-        if(Array.isArray(products[this.showPage]) && products[this.showPage].length) {
-
-            this.setState({
-                isShowModal: true
-            })
-            return 
-        } 
-        
-        axios.get('/c/api/shopify/productSearch.php').then(res => {
-            const { products = [] } = this.state 
+        axios.get(requestUrl).then(res => {
+ 
             const { data: { data = {} } = {} } = res || {}
             const { list = {} } = data || {}
             const { products: { edges = [], pageInfo = {} } =  {} } = list || {}
             const { hasNextPage } = pageInfo || {}
             this.hasNext = hasNextPage
-            this.cursor = edges[edges.length - 1].cursor
-          
+            this.cursor = edges[edges.length - 1] && edges[edges.length - 1].cursor
+            this.endPage = !this.hasNext
             const _edges = edges.map(data => {
                 return {
                     ...data,
                     isChecked: false
                 }
             })
-            products[this.currentPage] = edges
-            this.checkboxList.length = _edges.length
+
             this.setState({
-                products
+                products: edges,
+                loading: false
             })
         }).catch(error => {
+            this.setState({
+                loading: false
+            })
+            
             console.error(error)
         })
 
@@ -362,18 +359,72 @@ class Trigger extends Component {
         })
     }
 
+    handleClickAddProduct = (opt) => {
+        
+        let requestUrl = '/c/api/shopify/productSearch.php'
+          
+        this.setState({
+            inputValue: ''
+        })
+
+        
+        
+        axios.get(requestUrl).then(res => {
+            
+           
+            const { data: { data = {} } = {} } = res || {}
+            const { list = {} } = data || {}
+            const { products: { edges = [], pageInfo = {} } =  {} } = list || {}
+            const { hasNextPage } = pageInfo || {}
+            this.hasNext = hasNextPage
+            this.cursor = edges[edges.length - 1] && edges[edges.length - 1].cursor
+          
+            const _edges = edges.map(data => {
+                return {
+                    ...data,
+                    isChecked: false
+                }
+            })
+            this.isFirstRender = false
+            this.setState({
+                loading: false,
+                products: _edges
+            })
+        }).catch(error => {
+            this.isFirstRender = false
+            this.setState({
+                loading: false
+            })
+            console.error(error)
+        })
+
+        this.setState({
+            isShowModal: true
+        })
+    }
+
+    handleRadioChange(id) {
+        if(id) {
+            this.setState({
+                currentId: id
+            })
+        }
+    }
+
+    componentDidMount(){
+    }
+
     render(){
-        const { title, dataSource = [],products = [], isShowModal } = this.state
-        console.log(products[this.showPage])
+        const { title, dataSource = [],products = [], isShowModal, currentId } = this.state
         const radioStyle = {
             display: 'block',
-            height: '50px',
             width: '100%',
             overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            borderBottom: '1px dashed #ccc',
-            lineHeight: '50px',
+            textOverflow: 'ellipsis'
           };
+
+      
+       
         return (
             <div style={{...styles.wrap}}>
                 <div style={{ marginBottom: 12 }}>
@@ -407,17 +458,64 @@ class Trigger extends Component {
                     onOk={this.handleShowModal}
                     onCancel={this.handleCancelModal}
                     >
-                        <Radio.Group onChange={this.handleSelectCehckbox.bind(null)} value={this.state.radioValue} style={{width: '100%'}}>
-                            {
-                                Array.isArray(products[this.showPage]) && products[this.showPage].length ? products[this.showPage].map(value => {
-                                    const { node = {} } = value || {}
-                                    const { id, title, images = []} = node || {}
-                                    return  <Radio style={radioStyle} value={id} key={id}>{title}</Radio>
-                                }) : <Spin />
+                            <Search
+                                placeholder="input search text"
+                                value={this.state.inputValue}
+                                onChange={e => {
+                                    const value =  e.target.value
+                                    this.setState({
+                                        inputValue: value
+                                    })
+                                    // clearTimeout(this.time)
+                                    // this.time = setTimeout(() => {
+                                    //         this.handleSearcgProduct({
+                                    //             title: value
+                                    //     })
+                                    // }, 400);
+                                    
+                                }}
+                                onSearch={value => {
+                                    
+                                    this.handleSearcgProduct({
+                                        title: value
+                                    })
+                                }}
+                                style={{ width: 470,marginBottom: 20}}
+                            />
+                          <List
+                            size="large"
+                            loading={this.state.loading}
+                            style={{
+                                height: 500,
+                                overflow: 'scroll'
+                            }}
+                            bordered
+                            footer={
+                               (this.endPage || this.isFirstRender)  ?   null : <Button style={{ width: '100%', textAlign: 'center'}} onClick={this.handleLoadMore} >{'load more'}</Button>
                             }
-                        </Radio.Group>
-                        <Button style={{marginRight: 20}} onClick={this.handleLoadMore} disabled={this.showPage ===  this.endPage}>{'下一页'}</Button>
-                        <Button onClick={this.handlePrevData} disabled={this.showPage === 1}>{'上一页'}</Button>
+                            dataSource={products}
+                            renderItem={item => {
+                                const { node = {} } = item || {}
+                                const { id, title, images = {}} = node || {}
+                                const { edges = [] } = images
+                                const { node: imgNode } = edges && edges[0]
+                                const { src } = imgNode || {}
+                              
+                                return <List.Item key={id}>
+                                {
+                                <Radio  onChange={() =>{
+                                    this.handleRadioChange(id)
+                                }} style={radioStyle} value={id} key={id} checked={currentId === id}>
+                                    <img src={src} style={{height: 35, width: 35, borderRadius: 6, marginRight: 8,  objectFit: 'contain' }} alt=""/>
+                                    <span style={{
+                                        width: '100%',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis'
+                                    }}>{title}</span>
+                                </Radio>
+                                }</List.Item>
+                            }}
+                          />
                 </Modal>
             </div>
         )
