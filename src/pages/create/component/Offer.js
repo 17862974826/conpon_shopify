@@ -80,7 +80,7 @@ class Offer extends Component {
                         <p style={{marginRight: '10px', fontWeight: 'bold'}}>{'Offer type'}</p>
                         <Radio.Group onChange={this.handleSelectRadio} value={this.state.value}>
                             {
-                                radioData.map(({value, title }) =>  <Radio key={title} value={value}>{title}</Radio>)
+                                radioData.map(({value, title }, index) =>  <Radio disabled={index !== 0 } key={title} value={value}>{title}</Radio>)
                             }
                         </Radio.Group>
                     </div>

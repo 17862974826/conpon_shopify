@@ -132,7 +132,7 @@ class Trigger extends Component {
                     }
                     {
                         calendar ? <div style={{position: 'absolute', zIndex: 2,  top: -20, left: -50,  width: 300, border: '1px solid #d9d9d9', borderRadius: 4,backgroundColor:'#fff' }}>
-                             <RangePicker onChange={this.onPanelChange.bind(null, record)} />
+                             <RangePicker  showTime onChange={this.onPanelChange.bind(null, record)} />
                         </div> : null 
                     }
                 </div>
@@ -159,14 +159,18 @@ class Trigger extends Component {
         const { onDataLoad } = this.props
         const { key } = record || {}
         const { dataSource = [] } = this.state
+        
         const _time = value.map(_d => {
             const date = new Date(_d)
             const month = date.getMonth() + 1
             const year = date.getFullYear()
             const day = date.getDate()
+            const hours = date.getHours()
+            const minutes = date.getMinutes()
+            const seconds = date.getSeconds()
             const _month = month >= 10 ? month : `0${month}`
             const _day = day >= 10 ? day : `0${day}`
-            const time = `${year}-${_month}-${_day} 00:00:00`
+            const time = `${year}-${_month}-${_day} ${hours}:${minutes}:${seconds}`
             return time
         })
       
