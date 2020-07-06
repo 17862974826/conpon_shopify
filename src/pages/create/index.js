@@ -46,8 +46,13 @@ class Create extends Component {
       }
     }).then(res => {
       messageStatus()
-      message.success('提交成功')
-      console.log(res)
+      const { errorMsg, errorCode} = res.data || {}
+      if(errorCode === 0 ){
+        message.success('提交成功')
+      } else {
+        message.error(errorMsg)
+      }
+     
     }).catch(e => {
       messageStatus()
       message.error('提交失败，请重试')
