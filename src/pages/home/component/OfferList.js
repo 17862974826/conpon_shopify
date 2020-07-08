@@ -274,8 +274,8 @@ class  OfferList extends Component{
             const { data:{ data } = {} }  = res || {} 
             const { offerList = [] } = data || {}
             let tabs = offerList.map(res => {              
-                const { offer_name, product_info, id, update_time } = res || {}
-                const { status, pic, title } = product_info || {}
+                const { offer_name, product_info, id, update_time, status } = res || {}
+                const {  pic, title } = product_info || {}
                 return {
                     name: offer_name,
                     key: id,
