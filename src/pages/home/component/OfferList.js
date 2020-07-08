@@ -133,11 +133,13 @@ class  OfferList extends Component{
                 }
             },
             {
-                title: 'delete',
-                key: 'delete',
+                title: 'Offline',
+                key: 'Offline',
                 render: (data) => {
-                    const { key } = data || {}
-                    return <Button type="danger" onClick={this.handleDeleteProduct.bind(this, key)}>delete</Button>
+                    const { key, status } = data || {}
+                    const disable = status === 'Disable'
+
+                    return <Button type="danger" disabled={disable} onClick={this.handleDeleteProduct.bind(this, key)}>Offline</Button>
                 }
             }
           ]
@@ -149,10 +151,21 @@ class  OfferList extends Component{
             const { data: { errorCode, errorMsg } = {} } = res || {}
             const { allData = [] } = this.state
             if(errorCode === 0 ) {
-                const data = allData.filter(v => v.key !== id)
+                const data = allData.map(v => {
+                    if(id === v.key ) {
+                        return {
+                            ...v,
+                            status: id === v.key ? 'Disable' : 'Enable'
+                        }
+                    }
+                    return {
+                        ...v
+                    }
+                })
                
                 this.setState({
-                    data
+                    data,
+                    allData: data
                 })
                 
             } 
@@ -266,7 +279,7 @@ class  OfferList extends Component{
                 return {
                     name: offer_name,
                     key: id,
-                    status: !status ? 'Enable' : 'Disable',
+                    status: status === -1 ? 'Disable' : 'Enable',
                     pic,
                     title,
                     update_time
