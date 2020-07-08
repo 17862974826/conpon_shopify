@@ -2,7 +2,7 @@
   "name": "react-app",
   "version": "0.0.11",
   "private": true,
-  "proxy": "https://www.priceslash.info",
+  "proxy": "https://www.priceslash.online",
   "dependencies": {
     "@antv/g2": "^3.5.9",
     "@babel/core": "7.4.3",

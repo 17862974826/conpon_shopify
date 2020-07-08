@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Input, Table, Icon, Modal, Spin } from 'antd'
+import { Input, Table, Icon, Modal, Spin, Button } from 'antd'
 import axios from 'axios'
 import G2 from '@antv/g2'
 
@@ -108,7 +108,7 @@ class  OfferList extends Component{
                     const { update_time } = data || {}
                     const time  = new Date(update_time * 1000)
                     const year = time.getFullYear()
-                    const month = time.getMonth()
+                    const month = time.getMonth() + 1
                     const date = time.getDate()
                     return (
                         <div style={{display: 'flex', justifyContent: 'center'}}>
@@ -131,9 +131,38 @@ class  OfferList extends Component{
                         </div>
                     )
                 }
+            },
+            {
+                title: 'delete',
+                key: 'delete',
+                render: (data) => {
+                    const { key } = data || {}
+                    return <Button type="danger" onClick={this.handleDeleteProduct.bind(this, key)}>delete</Button>
+                }
             }
           ]
         
+    }
+
+    handleDeleteProduct = id => {
+        axios.get(`/c/api/shopify/offlineRule.php?offer_id=${id}`).then(res => {
+            const { data: { errorCode, errorMsg } = {} } = res || {}
+            const { allData = [] } = this.state
+            if(errorCode === 0 ) {
+                const data = allData.filter(v => v.key !== id)
+               
+                this.setState({
+                    data
+                })
+                
+            } 
+
+            alert(errorMsg)
+            
+
+        }).catch(e => {
+            alert('删除失败')
+        })
     }
 
     handleClickShowChart = key => {
@@ -213,7 +242,17 @@ class  OfferList extends Component{
     }
 
     handleSearcgProduct = ({title}) => {
-        console.log(title)
+        const {  allData = [] } = this.state 
+        const current = allData.filter(v => {
+            const { name } = v || {}
+            const reg = new RegExp(`${title}`, 'g')
+            if(reg.test(name)) {
+                return true
+            }
+        })
+       this.setState({
+           data: current
+       })
     }
 
     componentDidMount() {
@@ -236,7 +275,8 @@ class  OfferList extends Component{
 
             
             this.setState({
-                data: tabs
+                data: tabs,
+                allData: tabs
             })
 
         }).catch(e => {
@@ -264,6 +304,7 @@ class  OfferList extends Component{
                     dataSource={this.state.data} 
                     columns={this.columns}
                     bordered
+                    rowKey={record => record.key}
                     style={{width: 1000 }}
                     pagination={{
                         total: this.state.data.length,
@@ -279,7 +320,7 @@ class  OfferList extends Component{
             >
                 {
                     [status === 'loading' ? 
-                    <Spin /> : (
+                    <Spin key="spin"/> : (
                         <div style={{...styles.container}} key={'list'}>
                             <div style={{...styles.tab}}>
                                 {
@@ -305,7 +346,7 @@ class  OfferList extends Component{
                         </div>
                     ),
                     <div id="a" key='container'></div>
-                            ]
+                    ]
                 }
                 
             </Modal>
