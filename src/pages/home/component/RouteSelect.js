@@ -29,7 +29,7 @@ const Select = (props) => {
     return (
         <div style={{...styles.wrap}}>
             <div>
-            <Link to={'/'}>
+            <Link to={'/create'}>
                 <Button style={{...styles.button, marginRight: 20, width: 204}}>
                     <Icon type="plus" />
                     <span style={{...styles.text}}>{'Create discount offer'}</span>

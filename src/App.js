@@ -43,7 +43,7 @@ class App extends React.Component {
       <Router>
         <Layout className="layout" style={{ background: '#F7F7F7'}}>
             <div style={{position: 'sticky',top: 0, left: 0,  zIndex: 999,backgroundColor: '#DADADA', height: 76, overflow: 'hidden'}}>
-            <Link to="/home">
+            <Link to="/">
               <div style={{ margin: '0 auto'}}>
                   <p style={{width: 108, height: 40, marginTop: 18, marginLeft: 40}}>
                     <img src={logo} alt='' style={{width: 108, height: 40, objectFit: 'cover'}}/>
@@ -53,9 +53,9 @@ class App extends React.Component {
             </div>
           <Content style={{ boxSizing: 'border-box', paddingLeft: 40 }}>
            <Switch>
-              <Route exact path="/" component={CreateRoute} />
-              <Route path="/home" component={HomeRoute} />
-              <Route component={CreateRoute} />
+              <Route exact path="/" component={HomeRoute} />
+              <Route path="/create" component={CreateRoute} />
+              <Route component={HomeRoute} />
             </Switch>
           </Content>
           <Footer style={{ textAlign: 'center', marginTop: 100 }}>Ant Design ©2018 Created by Ant UED</Footer>
